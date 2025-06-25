@@ -3,10 +3,11 @@ import PowerModel from "../models/power.model.js";
 class PowerController {
   async create(req, res) {
     try {
-      const { name, description, image, damage, cooldown } = req.body;
+      const { name, description, damage, cooldown } = req.body;
+      const image = req.file ? req.file.filename : null;
 
-      if (!name || !description || !image || !damage) {
-        return res.status(400).json({ error: "Name, description, image, and damage are required" });
+      if (!name || !description || !damage) {
+        return res.status(400).json({ error: "Name, description, and damage are required" });
       }
 
       const powerId = await PowerModel.create({
@@ -42,14 +43,14 @@ class PowerController {
       res.status(500).json({ error: error.message });
     }
   }
-
   async update(req, res) {
     try {
       const id = req.params.id;
-      const { name, description, image, damage, cooldown } = req.body;
+      const { name, description, damage, cooldown } = req.body;
+      const image = req.file ? req.file.filename : req.body.image;
 
-      if (!name || !description || !image || !damage || !id) {
-        return res.status(400).json({ error: "Name, description, image, damage, and ID are required" });
+      if (!name || !description || !damage || !id) {
+        return res.status(400).json({ error: "Name, description, damage, and ID are required" });
       }
 
       const updatePowerModel = await PowerModel.update(id, {
@@ -98,6 +99,49 @@ class PowerController {
       });
     } catch (error) {
       console.error("Error deleting power:", error);
+      res.status(500).json({ error: error.message });    }
+  }
+
+  async uploadImage(req, res) {
+    try {
+      const id = req.params.id;
+      
+      if (!id) {
+        return res.status(400).json({ error: "Power ID is required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "Image file is required" });
+      }
+
+      // Check if power exists
+      const existingPower = await PowerModel.findById(id);
+      if (!existingPower) {
+        return res.status(404).json({ error: "Power not found" });
+      }
+
+      const image = req.file.filename;
+      const updateResult = await PowerModel.update(id, { 
+        name: existingPower.Power_name,
+        description: existingPower.Power_description, 
+        image,
+        damage: existingPower.Power_damage,
+        cooldown: existingPower.Power_cooldown
+      });
+
+      if (!updateResult || updateResult.error) {
+        return res.status(500).json({
+          error: updateResult?.error || "Failed to update power image",
+        });
+      }
+
+      res.status(200).json({
+        message: "Power image uploaded successfully",
+        image: image,
+        imageUrl: `/uploads/powers/${image}`
+      });
+    } catch (error) {
+      console.error("Error uploading power image:", error);
       res.status(500).json({ error: error.message });
     }
   }

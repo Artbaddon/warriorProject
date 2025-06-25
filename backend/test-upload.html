@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warriors API File Upload Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .response {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .auth-section {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Warriors API File Upload Test Page</h1>
+    
+    <div class="auth-section">
+        <h3>Authentication</h3>
+        <div class="form-group">
+            <label for="adminToken">Admin Token:</label>
+            <input type="password" id="adminToken" placeholder="Enter admin JWT token">
+        </div>
+        <button onclick="testLogin()">Test Admin Login</button>
+        <div id="loginResponse" class="response" style="display: none;"></div>
+    </div>
+
+    <!-- Race Upload Form -->
+    <div class="form-container">
+        <h2>Create Race with Image</h2>
+        <form id="raceForm">
+            <div class="form-group">
+                <label for="raceName">Name:</label>
+                <input type="text" id="raceName" required>
+            </div>
+            <div class="form-group">
+                <label for="raceDescription">Description:</label>
+                <textarea id="raceDescription" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="raceImage">Image:</label>
+                <input type="file" id="raceImage" accept="image/*">
+            </div>
+            <button type="submit">Create Race</button>
+        </form>
+        <div id="raceResponse" class="response" style="display: none;"></div>
+    </div>
+
+    <!-- Warrior Upload Form -->
+    <div class="form-container">
+        <h2>Create Warrior with Image</h2>
+        <form id="warriorForm">
+            <div class="form-group">
+                <label for="warriorName">Name:</label>
+                <input type="text" id="warriorName" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorDescription">Description:</label>
+                <textarea id="warriorDescription" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="warriorLevel">Level:</label>
+                <input type="number" id="warriorLevel" value="1" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorHealth">Health:</label>
+                <input type="number" id="warriorHealth" value="100" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorEnergy">Energy:</label>
+                <input type="number" id="warriorEnergy" value="100" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorAttack">Attack:</label>
+                <input type="number" id="warriorAttack" value="10" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorDefense">Defense:</label>
+                <input type="number" id="warriorDefense" value="5" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorSpeed">Speed:</label>
+                <input type="number" id="warriorSpeed" value="5" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorTypeId">Warrior Type ID:</label>
+                <input type="number" id="warriorTypeId" value="1" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorRaceId">Race ID:</label>
+                <input type="number" id="warriorRaceId" value="1" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="warriorImage">Image:</label>
+                <input type="file" id="warriorImage" accept="image/*">
+            </div>
+            <button type="submit">Create Warrior</button>
+        </form>
+        <div id="warriorResponse" class="response" style="display: none;"></div>
+    </div>
+
+    <!-- Power Upload Form -->
+    <div class="form-container">
+        <h2>Create Power with Image</h2>
+        <form id="powerForm">
+            <div class="form-group">
+                <label for="powerName">Name:</label>
+                <input type="text" id="powerName" required>
+            </div>
+            <div class="form-group">
+                <label for="powerDescription">Description:</label>
+                <textarea id="powerDescription" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="powerDamage">Damage:</label>
+                <input type="text" id="powerDamage" value="0" required>
+            </div>
+            <div class="form-group">
+                <label for="powerCooldown">Cooldown:</label>
+                <input type="number" id="powerCooldown" value="0" min="0">
+            </div>
+            <div class="form-group">
+                <label for="powerImage">Image:</label>
+                <input type="file" id="powerImage" accept="image/*">
+            </div>
+            <button type="submit">Create Power</button>
+        </form>
+        <div id="powerResponse" class="response" style="display: none;"></div>
+    </div>
+
+    <!-- Upload to Existing Entity -->
+    <div class="form-container">
+        <h2>Upload Image to Existing Entity</h2>
+        <div class="form-group">
+            <label for="entityType">Entity Type:</label>
+            <select id="entityType">
+                <option value="race">Race</option>
+                <option value="warrior">Warrior</option>
+                <option value="power">Power</option>
+                <option value="magic">Magic</option>
+                <option value="warrior-type">Warrior Type</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="entityId">Entity ID:</label>
+            <input type="number" id="entityId" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="entityImage">Image:</label>
+            <input type="file" id="entityImage" accept="image/*" required>
+        </div>
+        <button onclick="uploadToExisting()">Upload Image</button>
+        <div id="uploadResponse" class="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/api_v1';
+
+        // Test admin login
+        async function testLogin() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'admin123'
+                    })
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById('loginResponse');
+                responseDiv.style.display = 'block';
+                
+                if (response.ok) {
+                    responseDiv.className = 'response success';
+                    responseDiv.textContent = `Login successful! Token: ${data.token}`;
+                    document.getElementById('adminToken').value = data.token;
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.textContent = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('loginResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Network error: ${error.message}`;
+            }
+        }
+
+        // Generic form submission handler
+        async function submitForm(formId, endpoint, responseId) {
+            const form = document.getElementById(formId);
+            const formData = new FormData(form);
+            const token = document.getElementById('adminToken').value;
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById(responseId);
+                responseDiv.style.display = 'block';
+                
+                if (response.ok) {
+                    responseDiv.className = 'response success';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById(responseId);
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Network error: ${error.message}`;
+            }
+        }
+
+        // Race form
+        document.getElementById('raceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('raceName').value);
+            formData.append('description', document.getElementById('raceDescription').value);
+            const image = document.getElementById('raceImage').files[0];
+            if (image) formData.append('image', image);
+
+            await submitFormData('/race', formData, 'raceResponse');
+        });
+
+        // Warrior form
+        document.getElementById('warriorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('warriorName').value);
+            formData.append('description', document.getElementById('warriorDescription').value);
+            formData.append('level', document.getElementById('warriorLevel').value);
+            formData.append('health', document.getElementById('warriorHealth').value);
+            formData.append('energy', document.getElementById('warriorEnergy').value);
+            formData.append('attack', document.getElementById('warriorAttack').value);
+            formData.append('defense', document.getElementById('warriorDefense').value);
+            formData.append('speed', document.getElementById('warriorSpeed').value);
+            formData.append('warrior_type_id', document.getElementById('warriorTypeId').value);
+            formData.append('race_id', document.getElementById('warriorRaceId').value);
+            const image = document.getElementById('warriorImage').files[0];
+            if (image) formData.append('image', image);
+
+            await submitFormData('/warrior', formData, 'warriorResponse');
+        });
+
+        // Power form
+        document.getElementById('powerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('name', document.getElementById('powerName').value);
+            formData.append('description', document.getElementById('powerDescription').value);
+            formData.append('damage', document.getElementById('powerDamage').value);
+            formData.append('cooldown', document.getElementById('powerCooldown').value);
+            const image = document.getElementById('powerImage').files[0];
+            if (image) formData.append('image', image);
+
+            await submitFormData('/power', formData, 'powerResponse');
+        });
+
+        // Generic form data submission
+        async function submitFormData(endpoint, formData, responseId) {
+            const token = document.getElementById('adminToken').value;
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById(responseId);
+                responseDiv.style.display = 'block';
+                
+                if (response.ok) {
+                    responseDiv.className = 'response success';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById(responseId);
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Network error: ${error.message}`;
+            }
+        }
+
+        // Upload to existing entity
+        async function uploadToExisting() {
+            const entityType = document.getElementById('entityType').value;
+            const entityId = document.getElementById('entityId').value;
+            const image = document.getElementById('entityImage').files[0];
+            const token = document.getElementById('adminToken').value;
+
+            if (!image) {
+                alert('Please select an image file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', image);
+
+            try {
+                const response = await fetch(`${API_BASE}/${entityType}/${entityId}/upload-image`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById('uploadResponse');
+                responseDiv.style.display = 'block';
+                
+                if (response.ok) {
+                    responseDiv.className = 'response success';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseDiv.className = 'response error';
+                    responseDiv.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('uploadResponse');
+                responseDiv.style.display = 'block';
+                responseDiv.className = 'response error';
+                responseDiv.textContent = `Network error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

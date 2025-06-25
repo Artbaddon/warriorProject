@@ -1,0 +1,90 @@
+# Backend-specific sensitive files
+
+# Environment Variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Database Configuration
+config/db/connectMysql.js
+config/database.config.js
+database.config.js
+
+# JWT Secrets
+jwt.secret
+auth.secret
+*.secret
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+database.json
+
+# Log files
+logs/
+*.log
+error.log
+access.log
+app.log
+
+# Uploaded user content
+uploads/*
+!uploads/.gitkeep
+!uploads/.gitignore
+!uploads/*/
+
+# Temporary files
+tmp/
+temp/
+cache/
+
+# Session storage
+sessions/
+.sessions
+
+# Certificate files
+ssl/
+certificates/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# API Keys and credentials
+credentials/
+secrets/
+keys/
+api-keys.json
+service-account.json
+
+# Email templates with sensitive info
+email-templates/production/
+mail-config.json
+
+# Backup files
+backup/
+*.backup
+*.dump
+*.sql.backup
+
+# Development tools
+.vscode/settings.json
+.idea/
+
+# Test artifacts
+test-coverage/
+.nyc_output/
+
+# Process files
+*.pid
+.pid
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

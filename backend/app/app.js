@@ -1,5 +1,11 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Middleware imports
 import { verifyAdmin } from "../middleware/isAdmin.js";
@@ -28,6 +34,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Static file serving for uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
 // Public authentication routes (no middleware)
 app.post(api + "/admin/login", adminController.login);
 app.post(api + "/player/login", playerController.create);
@@ -46,6 +55,18 @@ app.use(api, verifyAdmin, warriorTypeRouter);
 app.use(api, verifyAdmin, magicRouter);
 app.use(api, verifyAdmin, powerRouter);
 app.use(api, verifyAdmin, adminRouter);
+
+// Error handling for multer
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    // Handle multer-specific errors
+    return res.status(500).json({ error: err.message });
+  } else if (err) {
+    // Handle other errors
+    return res.status(500).json({ error: 'An unexpected error occurred' });
+  }
+  next();
+});
 
 app.use((req, res, next) => {
   res.status(404).json({

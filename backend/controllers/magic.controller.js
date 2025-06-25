@@ -3,7 +3,8 @@ import MagicModel from "../models/magic.model.js";
 class MagicController {
   async create(req, res) {
     try {
-      const { name, description, image, mana_cost, damage } = req.body;
+      const { name, description, mana_cost, damage } = req.body;
+      const image = req.file ? req.file.filename : null;
 
       if (!name || !description) {
         return res.status(400).json({ error: "Name and description are required" });
@@ -42,11 +43,11 @@ class MagicController {
       res.status(500).json({ error: error.message });
     }
   }
-
   async update(req, res) {
     try {
       const id = req.params.id;
-      const { name, description, image, mana_cost, damage } = req.body;
+      const { name, description, mana_cost, damage } = req.body;
+      const image = req.file ? req.file.filename : req.body.image;
 
       if (!name || !description || !id) {
         return res.status(400).json({ error: "Name, description, and ID are required" });
@@ -98,6 +99,49 @@ class MagicController {
       });
     } catch (error) {
       console.error("Error deleting magic:", error);
+      res.status(500).json({ error: error.message });    }
+  }
+
+  async uploadImage(req, res) {
+    try {
+      const id = req.params.id;
+      
+      if (!id) {
+        return res.status(400).json({ error: "Magic ID is required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "Image file is required" });
+      }
+
+      // Check if magic exists
+      const existingMagic = await MagicModel.findById(id);
+      if (!existingMagic) {
+        return res.status(404).json({ error: "Magic not found" });
+      }
+
+      const image = req.file.filename;
+      const updateResult = await MagicModel.update(id, { 
+        name: existingMagic.Magic_name,
+        description: existingMagic.Magic_description, 
+        image,
+        mana_cost: existingMagic.Magic_mana_cost,
+        damage: existingMagic.Magic_damage
+      });
+
+      if (!updateResult || updateResult.error) {
+        return res.status(500).json({
+          error: updateResult?.error || "Failed to update magic image",
+        });
+      }
+
+      res.status(200).json({
+        message: "Magic image uploaded successfully",
+        image: image,
+        imageUrl: `/uploads/magic/${image}`
+      });
+    } catch (error) {
+      console.error("Error uploading magic image:", error);
       res.status(500).json({ error: error.message });
     }
   }

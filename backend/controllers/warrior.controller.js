@@ -7,7 +7,6 @@ class WarriorController {
       const {
         name,
         description,
-        image,
         level,
         health,
         energy,
@@ -19,6 +18,7 @@ class WarriorController {
         magic_id,
         power_ids,
       } = req.body;
+      const image = req.file ? req.file.filename : null;
 
       // Validate required fields
       if (
@@ -403,8 +403,46 @@ class WarriorController {
         message: "Warrior added to player successfully",
         data: result,
       });
+    } catch (error) {      console.error("Error adding warrior to player:", error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  // Upload warrior image
+  async uploadImage(req, res) {
+    try {
+      const id = req.params.id;
+      
+      if (!id) {
+        return res.status(400).json({ error: "Warrior ID is required" });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: "Image file is required" });
+      }
+
+      // Check if warrior exists
+      const existingWarrior = await WarriorModel.findById(id);
+      if (!existingWarrior) {
+        return res.status(404).json({ error: "Warrior not found" });
+      }
+
+      const image = req.file.filename;
+      const updateResult = await WarriorModel.update(id, { image });
+
+      if (updateResult.error) {
+        return res.status(500).json({
+          error: updateResult.error || "Failed to update warrior image",
+        });
+      }
+
+      res.status(200).json({
+        message: "Warrior image uploaded successfully",
+        image: image,
+        imageUrl: `/uploads/warriors/${image}`
+      });
     } catch (error) {
-      console.error("Error adding warrior to player:", error);
+      console.error("Error uploading warrior image:", error);
       res.status(500).json({ error: error.message });
     }
   }
