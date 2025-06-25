@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Warriors Backend Server",
+			"type": "shell",
+			"command": "npm start",
+			"group": "build",
+			"options": {
+				"cwd": "${workspaceFolder}/backend"
+			},
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}
